@@ -8,10 +8,11 @@ pipeline {
         ansiColor('xterm')
     }
     stages {
-        stage('install deoendencies') {
+        stage('install dependencies') {
             steps {
                sh """
                 npm install
+                ls -ltr
                """
             }
         }
