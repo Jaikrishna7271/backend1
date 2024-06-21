@@ -7,6 +7,9 @@ pipeline {
         disableConcurrentBuilds()
         ansiColor('xterm')
     }
+    environment{
+        def appVersion = '' //global level-variable declaration it implements in all stages
+    }
     stages {
         stage('read the version'){
             steps {
@@ -24,6 +27,14 @@ pipeline {
                 ls -ltr
                 echo "application version: $appVersion"
                """
+            }
+        }
+        stage('Build'){
+            steps{
+                sh """
+                zip -q -r backend-${appVersion}.zip * -x Jenkinsfile -x backend-${appVersion}.zip
+                ls -ltr
+                """
             }
         }
     }
