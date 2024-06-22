@@ -7,21 +7,24 @@ pipeline {
         disableConcurrentBuilds()
         ansiColor('xterm')
     }
+    parameters{
+        booleanParam(name: 'deploy', defaultValue: false, description: 'Toggle this value')
+    }
     environment{
-        def appVersion = '' //global level-variable declaration it implements in all stages
+        def appVersion = '' //variable declaration
         nexusUrl = 'jai-awsdevops.online:8081'
     }
     stages {
         stage('read the version'){
-            steps {
+            steps{
                 script{
                     def packageJson = readJSON file: 'package.json'
-                appVersion = packageJson.version
-                echo "application version: $appVersion"
-                }               
+                    appVersion = packageJson.version
+                    echo "application version: $appVersion"
+                }
             }
         }
-        stage('install dependencies') {
+        stage('Install Dependencies') {
             steps {
                sh """
                 npm install
@@ -38,7 +41,7 @@ pipeline {
                 """
             }
         }
-        stage('Nexus Artifact Upload'){
+         stage('Nexus Artifact Upload'){
             steps{
                 script{
                     nexusArtifactUploader(
@@ -59,7 +62,22 @@ pipeline {
                 }
             }
         }
-    
+        stage('Deploy'){
+            when{
+                expression{
+                    params.deploy
+                }
+            }
+            steps{
+                script{
+                    def params = [
+                        string(name: 'appVersion', value: "${appVersion}")
+                    ]
+                    build job: 'backend-deploy', parameters: params, wait: false
+                }
+            }
+        }
+    }
     post { 
         always { 
             echo 'I will always say Hello again!'
