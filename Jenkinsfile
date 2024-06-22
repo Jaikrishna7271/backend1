@@ -9,7 +9,7 @@ pipeline {
     }
     environment{
         def appVersion = '' //variable declaration
-        nexusUrl = 'nexus.http://54.204.103.232:8081'
+        nexusUrl = 'nexus.jai-awsdevops.online:8081'
     }
     stages {
         stage('read the version'){
